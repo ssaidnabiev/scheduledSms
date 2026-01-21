@@ -91,4 +91,4 @@ async function clearDatabase(tableName) {
 }
 
 
-module.exports = {newPgClient, add, update, smsTableName, getRequests, clearDatabase}
+module.exports = {add, update, smsTableName, getRequests, clearDatabase}

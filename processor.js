@@ -5,10 +5,11 @@ const scheduledSmsSendApiEndpoint = 'api/scheduledSms/send'
 
 const processNextQueue = async () => {
     const result = await db.getRequests(db.smsTableName)
+    const currentTimestamp = Date.now() / 1000
     try {
         if (result === false) {return}
 
-        const responsePromises = result.rows.map(async row => {
+        const responsePromises = result.rows.filter(row => currentTimestamp > row.time).map(async row => {
             try {
                 const responsePromise = await fetch(`https://${row.host}/${scheduledSmsSendApiEndpoint}`, {
                     method: 'POST',
@@ -77,7 +78,7 @@ const runScheduleHandler = () => {
             await helpers.sendErrorToGroup(error)
         }
         runScheduleHandler()
-    }, 30000)
+    }, 10000)
 }
 
 module.exports = {runScheduleHandler, runClearDBSchedule}
