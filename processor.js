@@ -14,7 +14,7 @@ const processNextQueue = async () => {
                 const responsePromise = await fetch(`https://${row.host}/${scheduledSmsSendApiEndpoint}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(row.ids.split(','))
+                    body: JSON.stringify({ids: row.ids.split(',')})
                 })
                 return responsePromise
             } catch (error) {
