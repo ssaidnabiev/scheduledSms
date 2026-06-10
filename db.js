@@ -61,13 +61,14 @@ async function getRequests(tableName) {
     // const pgClient = await newPgClient()
     const currentTimestamp = Date.now()
     const sql =
-        `select 
+        `select
             r.*
         from ${tableName} r
-        where r.time < ${currentTimestamp}`
-    
+        where r.time < $1
+            and r.status = 0`
+
     try {
-        const result = await pool.query(sql)
+        const result = await pool.query({text: sql, values: [currentTimestamp]})
         // await pgClient.end()
         return result
     } catch (error) {
@@ -81,8 +82,8 @@ async function clearDatabase(tableName) {
     // const pgClient = await newPgClient()
     try {
         const currentTimestamp = Date.now()
-        const sql = `delete from ${tableName} where time < ${currentTimestamp}`
-        await pool.query(sql)
+        const sql = `delete from ${tableName} where time < $1`
+        await pool.query({text: sql, values: [currentTimestamp]})
     } catch (error) {
         await helpers.sendErrorToGroup(error)
     }

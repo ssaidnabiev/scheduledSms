@@ -12,7 +12,24 @@ app.get('/sms/', (req, res) => {
 })
 
 app.post('/sms/add', async (req, res) => {
-    const params = req.body
+    const params = req.body || {}
+
+    const errors = []
+    if (typeof params.host !== 'string' || params.host.trim() === '') {
+        errors.push('host must be a non-empty string')
+    }
+    if (typeof params.ids !== 'string' || params.ids.trim() === '') {
+        errors.push('ids must be a non-empty comma-separated string')
+    }
+    if (!Number.isFinite(params.timestamp)) {
+        errors.push('timestamp must be a number (epoch milliseconds)')
+    }
+
+    if (errors.length > 0) {
+        res.status(400).end(JSON.stringify({ok: false, errors: errors}))
+        return
+    }
+
     res.end(
         JSON.stringify({
             ok: true,
@@ -34,10 +51,8 @@ app.listen(3001, async () => {
     processor.runClearDBSchedule()
 })
 
-// report error to group
+// log uncaught exceptions; the schedule loops keep running on their own
 process.on('uncaughtException', async (err, origin) => {
     console.error('uncaughtException')
     await helpers.sendErrorToGroup(err, origin)
-    processor.runScheduleHandler()
-    processor.runClearDBSchedule()
 })
