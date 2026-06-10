@@ -18,11 +18,16 @@ const processNextQueue = async () => {
                         'Content-Type': 'application/json',
                         'X-Internal-Token': info.internalSmsToken
                     },
-                    body: JSON.stringify({ids: row.ids.split(',')})
+                    body: JSON.stringify({ids: row.ids.split(',')}),
+                    signal: AbortSignal.timeout(15000)
                 })
                 return responsePromise
             } catch (error) {
-                return Promise.resolve({fetchFailed: true, error: error})
+                // "fetch failed" is generic; the real reason (DNS/conn/TLS/timeout)
+                // lives in error.cause — capture it so the row's error is diagnosable
+                const cause = error.cause ? (error.cause.code || error.cause.message || String(error.cause)) : ''
+                const message = cause ? `${error.message}: ${cause}` : error.message
+                return Promise.resolve({fetchFailed: true, error: message})
             }
 
         })
@@ -33,7 +38,7 @@ const processNextQueue = async () => {
             if (!response.fetchFailed) {
                 return await response.json()
             } else {
-                return Promise.resolve({success: false, error: response.error.message})
+                return Promise.resolve({success: false, error: response.error})
             }
         })
 
