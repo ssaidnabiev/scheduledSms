@@ -1,11 +1,13 @@
+// Returns a 'YYYY-MM-DD HH:MM:SS' string in UTC, so timestamps are consistent
+// regardless of the server's local timezone.
 function toSqlDateString(date) {
-    const year = date.getFullYear()
-    const month = date.getMonth() + 1
-    const day = date.getDate()
+    const year = date.getUTCFullYear()
+    const month = date.getUTCMonth() + 1
+    const day = date.getUTCDate()
 
-    const hour = date.getHours()
-    const minute = date.getMinutes()
-    const second = date.getSeconds()
+    const hour = date.getUTCHours()
+    const minute = date.getUTCMinutes()
+    const second = date.getUTCSeconds()
 
     const fHour = hour >= 10 ? hour : `0${hour}`
     const fMinute = minute >= 10 ? minute : `0${minute}`

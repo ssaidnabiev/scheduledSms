@@ -1,5 +1,6 @@
 const db = require('./db.js')
 const helpers = require('./helpers.js')
+const info = require('./info.js')
 const schedule = require('node-schedule')
 const scheduledSmsSendApiEndpoint = 'api/scheduledSms/send'
 
@@ -13,7 +14,10 @@ const processNextQueue = async () => {
             try {
                 const responsePromise = await fetch(`https://${row.host}/${scheduledSmsSendApiEndpoint}`, {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Internal-Token': info.internalSmsToken
+                    },
                     body: JSON.stringify({ids: row.ids.split(',')})
                 })
                 return responsePromise

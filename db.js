@@ -59,7 +59,7 @@ async function update(tableName, id, newRow) {
 
 async function getRequests(tableName) {
     // const pgClient = await newPgClient()
-    const currentTimestamp = Date.now()
+    const currentTimestamp = Math.floor(Date.now() / 1000) // epoch seconds, matches `time`
     const sql =
         `select
             r.*
@@ -81,7 +81,7 @@ async function getRequests(tableName) {
 async function clearDatabase(tableName) {
     // const pgClient = await newPgClient()
     try {
-        const currentTimestamp = Date.now()
+        const currentTimestamp = Math.floor(Date.now() / 1000) // epoch seconds, matches `time`
         const sql = `delete from ${tableName} where time < $1`
         await pool.query({text: sql, values: [currentTimestamp]})
     } catch (error) {
